@@ -1,0 +1,61 @@
+# azure-pipelines.yml
+
+# 👇 Event to trigger pipeline execution
+trigger:
+  - main
+
+variables:
+  YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
+
+# Pipeline stages
+stages:
+  - stage: Test
+    displayName: "Install dependencies and runs Chromatic"
+    jobs:
+      - job: Restore
+        displayName: "Install dependencies"
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - task: Cache@2
+            inputs:
+              key: "yarn | $(Agent.OS) | **/yarn.lock"
+              restoreKeys: |
+                yarn | $(Agent.OS) |
+                yarn |
+              path: $(YARN_CACHE_FOLDER)
+          - script: yarn install --frozen-lockfile --cache-folder $(YARN_CACHE_FOLDER)
+            displayName: "Install dependencies"
+            env:
+              CI: true
+          - task: CmdLine@2
+            inputs:
+              script: npx chromatic --project-token $(CHROMATIC_PROJECT_TOKEN)
+            env:
+              CHROMATIC_PROJECT_TOKEN: $(CHROMATIC_PROJECT_TOKEN)
+  # - stage: Test
+  #   displayName: Chromatic Testing
+  #   # Job list
+  #   jobs:
+  #     - job: Chromatic_Deploy
+  #       displayName: Install packages and publishes to Chromatic
+  #       variables:
+  #         # Sets scoped environment variable to cache packages
+  #         npm_config_cache: $(Pipeline.Workspace)/.npm
+  #       # List of steps
+  #       steps:
+  #         # 👇 Installs and configures Node environment
+  #         - task: NodeTool@0
+  #           inputs:
+  #             versionSpec: "12.x"
+  #           displayName: "Install Node.js"
+  #         - task: Cache@2
+  #           displayName: Install and cache packages
+  #           inputs:
+  #             key: 'npm | "$(Agent.OS)" | package-lock.json'
+  #             restoreKeys: |
+  #               npm | "$(Agent.OS)"
+  #             path: $(npm_config_cache)
+  #         - script: npm ci
+  #           condition: ne(variables.CACHE_RESTORED, 'true')
+  #           # 👇 Adds Chromatic as a step
