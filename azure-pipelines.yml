@@ -30,7 +30,7 @@ stages:
               CI: true
           - task: CmdLine@2
             inputs:
-              script: npx chromatic --project-token $(CHROMATIC_PROJECT_TOKEN)
+              script: npx chromatic --project-token=${CHROMATIC_PROJECT_TOKEN}
             env:
               CHROMATIC_PROJECT_TOKEN: $(CHROMATIC_PROJECT_TOKEN)
   # - stage: Test
