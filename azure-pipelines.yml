@@ -17,7 +17,7 @@ stages:
         pool:
           vmImage: "ubuntu-latest"
         steps:
-        - checkout: self
+          - checkout: self
             displayName: "Get full GIT history"
             fetchDepth: 0
           - task: Cache@2
