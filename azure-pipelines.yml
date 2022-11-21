@@ -17,6 +17,9 @@ stages:
         pool:
           vmImage: "ubuntu-latest"
         steps:
+        - checkout: self
+            displayName: "Get full GIT history"
+            fetchDepth: 0
           - task: Cache@2
             inputs:
               key: "yarn | $(Agent.OS) | **/yarn.lock"
@@ -28,9 +31,6 @@ stages:
             displayName: "Install dependencies"
             env:
               CI: true
-          - checkout: self
-            displayName: "Get full GIT history"
-            fetchDepth: 0
           - task: CmdLine@2
             inputs:
               script: npx chromatic --project-token=${CHROMATIC_PROJECT_TOKEN}
