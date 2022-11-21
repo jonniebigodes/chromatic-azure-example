@@ -28,6 +28,9 @@ stages:
             displayName: "Install dependencies"
             env:
               CI: true
+          - checkout: self
+            displayName: "Get full GIT history"
+            fetchDepth: 0
           - task: CmdLine@2
             inputs:
               script: npx chromatic --project-token=${CHROMATIC_PROJECT_TOKEN}
